@@ -388,25 +388,42 @@ __END__
 =head1 SYNOPSIS
 
  use Spark::Form;
- use CGI; #Because it makes for a quick and oversimplistic example
- use Third::Party::Field;
- $form = Spark::Form->new(plugin_ns => 'MyApp::Field');
- # Add a couple of inbuilt modules
+ use CGI;              # Because it makes for a quick and oversimplistic example
+ use Third::Party::Field; # You can add custom field types
+ use SparkX::Form::Field::Select; # Fields with complex arguments need creating
+                                  # explicitly
+ 
+ my $form = Spark::Form->new(plugin_ns => 'MyApp::Field'
+                             # Tell the form how to print itself
+                             printer => "SparkX::Form::Printer::List"
+                             );
+ 
+ 
+ # Add some fields to the form. 
  $form->add('email','email',confirm_field => 'email-confirm')
       ->add('email','email-confirm')
-      ->add('password','password',regex => qr/^\S{6,}$/),
-      #This one will be autoloaded from MyApp::Field::Username
+      ->add('password','password',regex => qr/^\S{6,}$/)
+      ->add('select','selectName', options => [qw/foo bar baz/], value => 'bar')
+      # This one will be autoloaded from MyApp::Field::Username
       ->add('username','username')
       # And this shows how you can use a third party field of any class name
-      ->add(Third::Party::Field->new(name => 'blah'));
- #Pass in a HashRef of params to populate the virtual form with data
+      ->add(Third::Party::Field->new(name => 'blah'))
+      ;
+ 
+ # Pass in a HashRef of params to populate the virtual form with data
  $form->data(CGI->new->params);
- #And do the actual validation
+ 
+ # And do the actual validation
  if ($form->validate) {
      print "You are now registered";
  } else {
+     # List the errors
      print join "\n", $form->errors;
+     # Redisplay the form
+     print $form; # This will use SparkX::Form::Printer::List
  }
+ 
+ 
 
 and over in MyApp/Field/Username.pm...
 
