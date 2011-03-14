@@ -33,6 +33,14 @@ has valid => (
     default  => 0,
 );
 
+has client_id => (
+    isa         => 'Str|Undef',
+    is          => 'rw',
+    required    => 0,
+    default     => sub { my $self = shift; $self->name },
+    
+);
+
 has _errors => (
     traits    => ['Array'],
     isa       => 'ArrayRef[Str]',
@@ -129,6 +137,15 @@ L<SparkX::Form::BasicFields>.
 
 Name of the field in the data source. Will be slurped on demand.
 Required at validation time, not at construction time.
+
+=head2 client_id => Str
+
+ID of the field in the data source. Used by HTML renderers to apply an id
+attribute for use with the for attribute of the label element and as a hook
+for CSS and JavaScript.
+
+Defaults to the same value as the name. NB: in (X)HTML a name can be
+shared but an id must be unique within a document.
 
 =head2 form => Spark::Form
 
